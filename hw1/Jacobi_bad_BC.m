@@ -1,4 +1,4 @@
-function [u , count] = Jacobi2D_lap_mixed_BCs(ep,N,M,hx,hy)
+function u = Jacobi_bad_BC(ep,N,M,hx,hy)
 % this function uses Jacobi iteration to find the solution to 
 % the Poisson equation with a dirichlet BC or a one variable boundary 
 % distribution for the x boundaries and Neumann conditions for the y
@@ -16,12 +16,11 @@ c = (hx^2*hy^2)/( 2*(hx^2+hy^2) );
 % BCs
 % zero at x=1, last row already zero
 for j = 1:M
-    u(1,j) = cos(2*pi*(j-1)*hy) ;
+    u(1,j) = sign( cos(2*pi*(j-1)*hy) );
 end
 
 u_init = u;
 error = ep+1;
-count = 0;
 while(error > ep)
     unew = u_init;
     % do iteration
@@ -39,6 +38,5 @@ while(error > ep)
         % store newest computed solution as the solution to be retturned,
         % if it is converged, this u will be returned 
         u = unew;
-        count = count + 1; 
 end
 end

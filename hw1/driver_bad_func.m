@@ -1,18 +1,17 @@
 %% Lewis Gross
 % This is a script to solve the 2D Poisson equations with the BCS
-% specified in part C)(a) 
+% with the modified condition for C)(f) 
 clear
 
 % list of grid sizes to compute
 % x mesh point number
-NN = [6,22,52,102,202];
+NN = [6,10,22,40,52];
 hN = 1./(NN-ones(1,length(NN)));
 % y mesh point number
-MM = [4,20,50,100,200];
+MM = [4,8,20,38,50];
 hM = 1./(MM-ones(1,length(MM)));
 a = 0; b = 1 ;
 errors=zeros(length(NN),1);
-counts=zeros(length(NN),1);
 for k = 1:length(NN)
     % Grid and Analytical Solution
     N = NN(k); M =MM(k);
@@ -23,10 +22,25 @@ for k = 1:length(NN)
     [X , Y] = meshgrid(x,y);
     Z = analytical(X,Y) ; 
   
-    % convergence tolerance for Jacobi
-    ep = 1e-14; 
+    % convergence tolerance for Jacobi, much lower since we're expecting a
+    % bad result, no need to have the iterations go for as long as before
+    ep = 1e-5; 
     % call solver
-    [u, c] = Jacobi2D_lap_mixed_BCs(ep,N,M,hx,hy);
-    counts(k) = c;
+    u = Jacobi_bad_BC(ep,N,M,hx,hy);
     errors(k) = max( max(abs(u'-Z)) );  %compute max error among all grid points
 end
+figure(1);plot(log(NN),log(errors),'ro')
+xlabel('log of N grid points')
+ylabel('log of error')
+
+figure(2);p2=surf(X,Y,u')
+set(p2,'edgecolor','none')
+xlabel('x')
+ylabel('y')
+zlabel('numerical')
+
+figure(3);p3=surf(X,Y,abs(u'-Z))
+set(p3,'edgecolor','none')
+xlabel('x')
+ylabel('y')
+zlabel('abs dif')

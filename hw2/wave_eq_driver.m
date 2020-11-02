@@ -60,6 +60,7 @@ for k = 1:length(Ms)
         end
     end
     
+    % I HIGHILY RECOMMEND DOING THIS ONCE, IT IS COOL AF
     % uncomment for time evolution plot plotting
 %     maxZ = max(max(abs(u(:,:))));
 %     for n=1:N
@@ -74,11 +75,8 @@ for k = 1:length(Ms)
         u_fine_to_coarse = interp2(X_fine,Y_fine,u_fine(:,:,n),X,Y);
         errors(k,n) =  max( max(abs(u_fine_to_coarse(:,:) - u(:,:,n)) ) );
     end
-    k
-    
+
 end
 plot(log(hs),log(errors),'b')
 xlabel('log of step size')
 ylabel('log of error')
-
-

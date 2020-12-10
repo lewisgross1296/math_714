@@ -5,7 +5,7 @@
 clear ; clc;
 
 %% visualize chebyshev grid and compute DN
-N = 30;
+N = 60;
 [DN,cheb_grid] = cheb(N); 
 y =  sqrt(1-cheb_grid.^2);
 figure(1);plot(cheb_grid,y,'b-o')
@@ -15,7 +15,7 @@ for j = 1:N
 end
 
 
-%% forcing functinos and analytical solutions, use anonymous style definition
+% forcing functinos and analytical solutions, use anonymous style definition
 
 f1 = @(x) 1 - x.^2;
 u1 = @(x) (6*x.^2 - x.^4 - 5)/12 ;
@@ -53,12 +53,12 @@ figure(4);plot(cheb_grid(2:end-1),f1_trunc,cheb_grid,f1(cheb_grid))
 % f2_trunc
 % f3_trunc
 % f4_trunc
-% make Dn tilde squared
+% make Dn tilde
 DN_sq=DN^2;
 DN_sq_tilde = DN_sq(2:end-1,2:end-1);
 v(2:end-1) =DN_sq_tilde\f1_trunc;
 
-v(2:end-1) = gmres(DN_sq_tilde,f1_trunc);
+% v(2:end-1) = gmres(DN_sq_tilde,f1_trunc);
 
 % do gmres with function handle that is responsible for computing u''
 % see laplacian.m, one go of the loop tho
@@ -82,3 +82,30 @@ figure(5);plot(cheb_grid,v,'bo',cheb_grid,u1(cheb_grid),'r')
 
 
 %% study how a affects convergence for heaviside 
+
+%% condition number study
+N = [3:1:100];
+conds_DN=zeros(size(N));
+conds_DNsq = zeros(size(N));
+conds_DN_til=zeros(size(N));
+conds_DNsq_til = zeros(size(N));
+
+for n = 1:length(N)
+    [DN,~] = cheb(N(n)); 
+    DN_sq = DN^2;
+    conds_DN(n) = cond(DN);
+    conds_DNsq(n) = cond(DN_sq);
+    conds_DN_til(n) = cond(DN(2:end-1,2:end-1));
+    conds_DNsq_til(n) = cond(DN_sq(2:end-1,2:end-1));
+end
+
+conds_DN= log(conds_DN);
+conds_DNsq = log(conds_DNsq);
+conds_DN_til= log(conds_DN_til);
+conds_DNsq_til = log(conds_DNsq_til);
+
+
+figure(6);plot(N,conds_DN,'b-o',N,conds_DNsq,'r-o',N,conds_DN_til,'k-o',N,conds_DNsq_til,'m-o')
+xlabel('N')
+ylabel('condition number')
+legend('DN','$DN^{2}$','$\tilde{DN}$','$\tilde{DN}^{2}$','Interpreter','latex')
